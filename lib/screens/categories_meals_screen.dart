@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:foodapp/components/meal_item.dart';
-import 'package:foodapp/data/dummy_data.dart';
-import 'package:foodapp/models/category.dart';
+
+import '../components/meal_item.dart';
+import '../models/category.dart';
+import '../models/meal.dart';
 
 class CategoriesMealsScreen extends StatelessWidget {
-  //remove constructor and pass all information with ModalRoute.of(context).settings.arguments as Category;
-  // that is new way to send information by router
-  //final Category category;
-  //const CategoriesMealsScreen(this.category);
+
+  final List<Meal> meals;
+
+  const CategoriesMealsScreen(this.meals);
 
   @override
   Widget build(BuildContext context) {
     final category = ModalRoute.of(context).settings.arguments as Category;
 
-    final categoryMeals = DUMMY_MEALS.where((meal) {
+    final categoryMeals = meals.where((meal) {
       return meal.categories.contains(category.id);
     }).toList();
 

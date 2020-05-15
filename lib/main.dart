@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodapp/data/dummy_data.dart';
 import 'package:foodapp/models/meal.dart';
+import 'package:foodapp/models/settings.dart';
 import 'package:foodapp/screens/categories_meals_screen.dart';
 import 'package:foodapp/screens/categories_screen.dart';
 import 'package:foodapp/screens/meal_detail_screen.dart';
@@ -17,7 +18,35 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   List<Meal> _availableMeals = DUMMY_MEALS;
-  
+  List<Meal> _favotireMeals = [];
+
+  void _filterMeals(Settings settings) {
+    setState(() {
+      _availableMeals = DUMMY_MEALS.where((meal) {
+        final filterGluten = settings.isGlutenFree && !meal.isGlutenFree;
+        final filterLactose = settings.isLactoseFree && !meal.isLactoseFree;
+        final filterVegan = settings.isVegan && !meal.isVegan;
+        final filterVegetarian = settings.isVegetarian && !meal.isVegetarian;
+        return !filterGluten &&
+            !filterLactose &&
+            !filterVegan &&
+            !filterVegetarian;
+      }).toList();
+    });
+  }
+
+  void _toggleFavorite(Meal meal) {
+    setState(() {
+      _favotireMeals.contains(meal)
+          ? _favotireMeals.remove(meal)
+          : _favotireMeals.add(meal);
+    });
+  }
+  bool _isFavorite(Meal meal){
+    return _favotireMeals.contains(meal);
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,10 +65,11 @@ class _MyAppState extends State<MyApp> {
       ),
       //home: CategoriesScreen(),
       routes: {
-        AppRoutes.HOME: (ctx) => TabScreen(),
-        AppRoutes.CATEGORIES_MEALS: (ctx) => CategoriesMealsScreen(),
-        AppRoutes.MEAL_DETAIL: (ctx) => MealDetailScreen(),
-        AppRoutes.SETTINGS: (ctx) => SettingsScreen(),
+        AppRoutes.HOME: (ctx) => TabScreen(_favotireMeals),
+        AppRoutes.CATEGORIES_MEALS: (ctx) =>
+            CategoriesMealsScreen(_availableMeals),
+        AppRoutes.MEAL_DETAIL: (ctx) => MealDetailScreen(_toggleFavorite, _isFavorite),
+        AppRoutes.SETTINGS: (ctx) => SettingsScreen(_filterMeals),
       },
     );
   }
